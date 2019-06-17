@@ -11,7 +11,7 @@ redirect to the Data-Collector folder open a terminal and go to your working env
 first you need install all requirements
 
 ```sh
-$ cd  folder_path/Data-collector
+$ cd  folder_path/DFF
 $ pip install -r requirements.txt
 ```
 
