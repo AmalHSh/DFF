@@ -1,0 +1,212 @@
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+.container {
+  margin: 0 auto;
+  width: 100%;
+
+  background-color: #ffffff;
+  color: #000000;
+  overflow:hidden;
+  text-align: center;
+  font-size: 1em;
+  font-weight: bold;
+}
+
+.container h2 {
+  font-family: Arial, sans-serif;
+  font-size: 20px;
+  color: White;
+  margin-top: 80px;
+}
+
+.container form {
+  margin: 10px;
+}
+
+.container input {
+  width: 150px;
+  height: 7px;
+  font-size: 15px;
+  margin: 2px;
+  padding: 10px;
+}
+.container select{
+border-radius: 25px;
+width:173px;
+height: 33px;
+border: 2px solid #000;
+background:#fff;
+text-align-last: center;
+margin: 2px;
+}
+
+.button {
+  border-radius: 25px;
+  width:150px;
+  height: 50px;
+  background-color: #40D44A;
+  margin: 7px;
+  border: 2px solid #40D44A;
+    text-decoration: none;
+    padding: 5px;
+    color:white;
+    background-color: #40D44A;
+    font-weight: bold;
+    border-radius: 4px;
+}
+.container p {
+  margin: 100px;
+}
+
+.right
+{
+text-align: right;
+}
+
+.message{
+  font-family: ariel, sans-serif, verdana;
+  font-size: 16px;
+  color: green;
+}
+
+.box {
+border-radius: 25px;
+border: 2px solid #000;
+background:#fff;
+text-align:center;
+}
+
+.container option{
+text-align:center;
+}
+
+/* Create three unequal columns that floats next to each other */
+.column {
+  float: left;
+  padding: 10px;
+}
+
+.right {
+  width: 35%;
+}
+ .middle{
+  width: 13%;
+}
+
+.left {
+  width: 48%;
+}
+.all {
+width:97.1%;
+}
+
+.other {
+
+  width: 55%;
+  margin-left: 35px;
+ float: left;
+border:2px solid black;
+align-content: center;
+padding-top:50px;
+padding-bottom: 50px;}
+
+
+
+}
+
+.rightrow {
+  width: 100%;
+  float: right;
+  align-items: right;
+  height: 50px;
+
+
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+@media screen and (max-width: 600px) {
+  .column {
+    width: 100%;
+  }
+}
+.load {
+ border-radius: 25px;
+  width:150px;
+  height: 20px;
+  background-color: #A81919;
+  margin: 7px;
+  border: 2px solid #A81919;
+    text-decoration: none;
+    padding: 2px;
+    color:white;
+    font-weight: bold;
+
+}
+
+
+
+.container #dropFileForm {
+  margin-left : 40%;
+  margin-top: 15%;
+  margin-left: 15%
+  align: center;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: 0.5s;
+  height: 365px;
+ text-decoration: none;
+ color: black;
+ text-align: center;
+float: center;
+
+}
+
+.container #dropFileForm #fileLabel {
+  background-color: white;
+  display: block;
+
+  position: relative;
+  cursor: pointer;
+}
+
+.container #dropFileForm #fileInput {
+  display: none;
+}
+
+.container #dropFileForm #fileLabel:after,
+.container #dropFileForm #fileLabel:before {
+
+}
+
+.container  #dropFileForm #fileLabel:before {
+  z-index: -1;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 5%,
+    black 5%,
+    black 10%
+  );
+  opacity: 0;
+  transition: 0.5s;
+}
+
+.container  #dropFileForm.fileHover #fileLabel:before {
+  opacity: 0.25;
+}
+
+
+
+.container #dropFileForm.fileHover {
+
+}
+

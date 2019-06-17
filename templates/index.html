@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<!--
+
+-->
+<html lang="en">
+  <title> Data Collector App</title>
+  <head>
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+   <script type="text/javascript" src="{{ url_for('static', filename='popup.js') }}"></script>
+     <script type="text/javascript" src="{{ url_for('static', filename='upload.js') }}"></script>
+<script>
+    function onClick(x) {
+        if (x.id === 'button2') {document.getElementById("form2").style.visibility = "visible";document.getElementById("form1").style.visibility = "hidden";}
+    }
+</script>
+  </head>
+
+
+    <body>
+
+      <div class="container">
+<table style="width:100%">
+<tr>
+
+
+<th aligh="right">
+<div class="row rightrow">
+  <img src= {{ url_for('static', filename = 'download.png') }} height="50px" align="right">
+</div>
+ <div class="message">
+         {{comment | safe}}
+
+
+        </div>
+
+<div class="raw">
+
+    {%if img%}
+    <div class="column left">
+    <img src='data:image/png;base64, {{img}}' width=100% />
+    </div>
+
+    <div class="column middle" >
+      <table>
+              <tr><th style="text-align:left;"> File name: </th><th style="text-align:left;">{{filename}}</th><tr>
+
+      </table>
+    <table>
+            <tr><th style="text-align:left;"> Length(mm): </th><th style="text-align:left;">{{X}}</th><tr>
+            <tr><th style="text-align:left;"> Width(mm): </th><th style="text-align:left;">{{Y}}</th></tr>
+            <tr><th style="text-align:left;"> High(mm): </th><th style="text-align:left;">{{Z}}</th></tr>
+    </table>
+
+
+
+    <form action= "{{url_for('rotate')}}" method="POST">
+    X°: <input title="info" placeholder="angle" type="float" name="x" value='0' class= "box"> <br>
+    Y°: <input title="info" placeholder="angle" type="float" name="y" value='0' class= "box" > <br>
+    Z°: <input title="info" placeholder="angle" type="float" name="z" value='0' class= "box" > <br>
+    <button  class="button" type="submit">Rotate </button>
+    </form>
+    </div>
+</div>
+
+{%else%}
+<div class="column other">
+
+  <form id="dropFileForm" action="{{url_for('upload')}}" method="post" enctype="multipart/form-data">
+    <input type="file" name="image" id="fileInput" multiple onchange=this.form.submit()>
+      <label for="fileInput" id="fileLabel"ondragover="overrideDefault(event);fileHover();" ondragenter="overrideDefault(event);fileHover();" ondragleave="overrideDefault(event);fileHoverEnd();" ondrop="overrideDefault(event);fileHoverEnd();
+            addFiles(event);">
+
+      <i class="fa fa-download fa-5x"></i>
+      <br>
+      <span id="fileLabelText">
+        <table>
+                <tr><th style="text-align:center;"> <img src= {{ url_for('static', filename = 'upload.png') }} width="100" align="center" > </th><tr>
+                <tr><th style="text-align:center;">Choose an stl file</th></tr>
+        </table>
+
+
+
+      </span>
+      <br>
+      <span id="uploadStatus"></span>
+    </label>
+  </form>
+    </div>
+
+
+
+
+
+{%endif%}
+<div class="column right" >
+{%if remember==1%}
+            <form action="{{url_for('data_reload')}}" method='POST'>
+                 <button class="load" type="submit" name="button" >Reload last answer</button>
+            </form>
+          <form action="{{url_for('data_added')}}" method='POST'  >
+	     	  Part name: <input title="info" placeholder="Enter the part name" type="text"  name="part_name"  class= "box" required > <br>
+              Rotu size:  <select  name="rotu_size" required>
+                                            <option value="S">S</option>
+                                            <option value="M">M</option>
+                                            <option value="L">L</option>
+
+                                             </select> <br>
+
+             Hooking grade: <select  name="Hooking_grade" placeholder="Hooking grade" required>
+                                                                           <option value="No">No</option>
+                                                                           <option value="Yes">Yes</option>
+                                                                            </select> <br>
+              Difficulty:  <select  name="difficulty" style="text-align:center;" required>
+                                            <option value="0">0(no_go)</option>
+                                            <option value="1">1(Easy)</option>
+                                            <option value="2">2(medium)</option>
+                                            <option value="3">3(hard)</option>
+
+                                             </select> <br>
+
+              Pressured air: <select  name="pressured_air" required>
+                                            <option value="No">No</option>
+                                            <option value="Yes">Yes</option>
+                                             </select> <br>
+              Achievable parts per minute per track: <input title="info" placeholder="parts per minute" type="number" name="parts" class= "box" required> <br>
+              Number of output tracks: <input title="info" placeholder="output" type="number" name="output_track" class= "box"   required> <br>
+
+          <button class="button" type="submit" name="submit_button" value="1" > Save Data </button>
+        </form>
+
+{%endif %}
+{%if remember==2%}
+
+          <form action="{{url_for('data_added')}}" method='POST' id="forum2" style="visibiliy: hidden; ">
+	     	  Part name: <input title="info" placeholder="Enter the part name" type="text"  name="part_name"  class= "box" required value="{{ choices[0] }}"> <br>
+              Rotu size:  <select  name="rotu_size" required>
+                                            <option value="S"{% if choices[1]=="S" %}selected {%endif%}>S</option>
+                                            <option value="M"{% if choices[1]=="M" %}selected {%endif%}>M</option>
+                                            <option value="L"{% if choices[1]=="L" %}selected {%endif%}>L</option>
+
+                                             </select> <br>
+             Hooking grade: <select  name="Hooking_grade" placeholder="Hooking grade" required>
+                                                                           <option value="No" {% if choices[2]=="No" %}selected {%endif%}>No</option>
+                                                                           <option value="Yes"{% if choices[2]=="Yes" %}selected {%endif%}>Yes</option>
+                                                                            </select> <br>
+              Difficulty:  <select  name="difficulty" required>
+                                           <option value="0"{% if choices[3]=="0" %}selected {%endif%}>0(no go)</option>
+                                            <option value="1"{% if choices[3]=="1" %}selected {%endif%}>1(Easy)</option>
+                                            <option value="2" {% if choices[3]=="2" %}selected {%endif%} >2(medium)</option>
+                                            <option value="3"{% if choices[3]=="3" %} selected {%endif%}>3(hard)</option>
+
+                                             </select> <br>
+              Pressured air: <select  name="pressured_air" required>
+                                            <option value="NO"{% if choices[4]=="NO" %}selected {%endif%}>No</option>
+                                            <option value="Yes"{% if choices[4]=="Yes" %}selected {%endif%}>Yes</option>
+                                             </select> <br>
+              Achievable parts per minute per track: <input title="info" placeholder="parts per minute" type="number" name="parts" class= "box"  value="{{ choices[5] }}"required> <br>
+              Number of output tracks: <input title="info" placeholder="output" type="number" name="output_track" class= "box"  value="{{ choices[6] }}" required> <br>
+
+              <button class="button" type="submit" name="submit_button" value="1"> Save Data </button>
+        </form>
+{%endif%}
+</div>
+</div>
+        </div>
+
+
+
+    </body>
+</html>
