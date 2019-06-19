@@ -74,8 +74,8 @@ def show(your_mesh,cog,inertia,l):
 
     #these two images discribe the feeding direction and the gravity
     #when changing the location of the project make sure to change the path name
-    im = plt.imread(get_sample_data('/home/user/Desktop/Data-Collector/static/feedd.png'))
-    im2 = plt.imread(get_sample_data("/home/user/Desktop/Data-Collector/static/gravity.png"))
+    im = plt.imread(get_sample_data('/home/user/DFF/static/feedd.png'))
+    im2 = plt.imread(get_sample_data("/home/user/DFF/static/gravity.png"))
 
     #this code places the two images above in their proper positions in the output image
     newax = fig.add_axes([0.4, 0.8, 0.2, 0.2], anchor='NE', zorder=-1)
@@ -135,6 +135,72 @@ def show(your_mesh,cog,inertia,l):
     fig.savefig(tmpfile, format='png')
     return base64.b64encode(tmpfile.getvalue())
 
+def is_pos(x):
+    return np.all(np.linalg.eigvals(x) > 0)
+
+def to_original(mesh):
+    m=mesh.points
+    v0=m[:,0]
+    v1=m[:,3]
+    v2=m[:,6]
+    neg=0
+    pos=0
+    for i in range(m.shape[0]):
+        if v0[i]>0:
+            pos+=1
+        else: neg +=1
+        if v1[i]>=0:
+            pos+1
+        else: neg +=1
+        if v2[i]>0:
+            pos+=1
+        else: neg +=1
+    print(pos, neg )
+    if pos < neg:
+        print('done')
+        mesh.rotate([0,1,0], math.radians(180))
+
+def align(mesh, ax, inertia):
+    m=mesh.points
+    bx=np.linalg.inv(ax)
+    v0=m[:,0:3]
+    v1=m[:,3:6]
+    v2=m[:,6:9]
+    if np.count_nonzero(inertia - np.diag(np.diagonal(inertia)))!= 0:
+        print('done')
+        for i in range(m.shape[0]):
+            m[i,0:3] = bx.dot(v0[i])
+            m[i,3:6] = bx.dot(v1[i])
+            m[i,6:9] = bx.dot(v2[i])
+            mesh.points=m
+    return mesh
+
+
+def correct(mesh):
+    volume, cog, inertia = mesh.get_mass_properties()
+    eigs, ax = np.linalg.eigh(inertia)
+    angleX = np.arccos(np.dot([1, 0, 0],np.around(ax[0,:])) /  ( np.linalg.norm([1, 0, 0])*np.linalg.norm(np.around(ax[0,:]))))
+    angleY = np.arccos(np.dot([0, 1, 0],np.around(ax[1,:])) / ( np.linalg.norm([0, 1, 0]) *np.linalg.norm(np.around(ax[1,:]))))
+    angleZ = np.arccos(np.dot([0, 0, 1],np.around(ax[2,:])) / ( np.linalg.norm([0, 0, 1]) * np.linalg.norm(np.around(ax[2,:]))))
+    print (angleX* 180/np.pi ,'    ', angleY* 180/np.pi  ,'    ',angleZ* 180/np.pi)
+    if angleZ==0.0 and angleX==0 and angleY==0.0:
+        print('nothing to do')
+        return mesh
+    elif angleX==0.0 :
+        mesh.rotate([1,0,0], angleZ)
+        print('rotate X')
+        return mesh
+    elif angleY==0.0 :
+        mesh.rotate([0,1,0], angleX)
+        print('rotate Y')
+        return mesh
+    elif angleZ==0.0 :
+        mesh.rotate([0,0,1],angleY)
+        print('rotate Z')
+        return mesh
+    else:
+        mesh.rotate([1,0,0],(angleZ))
+        return correct(mesh)
 
 
 #This function has a job of taking an stl file shift it to his center of mass and shift to his main axes
@@ -155,21 +221,16 @@ def convert(file,l):
     volume, cog, inertia = your_mesh.get_mass_properties()
     eigs, ax = np.linalg.eigh(inertia)
     m=your_mesh.points
-    ax=ax.transpose()
-    v0=m[:,0:3]
-    v1=m[:,3:6]
-    v2=m[:,6:9]
-    if np.count_nonzero(np.around(inertia) - np.diag(np.diagonal(np.around(inertia))))!= 0:
-     for i in range(m.shape[0]):
-            m[i,0:3] = ax.dot(v0[i])
-            m[i,3:6] = ax.dot(v1[i])
-            m[i,6:9] = ax.dot(v2[i])
 
-    your_mesh.points = m
+    your_mesh=align(your_mesh, ax, inertia)
     volume, cog, inertia = your_mesh.get_mass_properties()
+    eigs, ax = np.linalg.eigh(inertia)
+    if is_pos(inertia)== False:
+        your_mesh=align(your_mesh,ax, inertia)
+
+    your_mesh=correct(your_mesh)
+    to_original(your_mesh)
     cog = cog.astype(type('float', (float,), {}))
-    inertia = inertia.astype(type('float', (float,), {}))
-    inertia = preprocessing.normalize(inertia, norm='l1')
 
     encoded=show(your_mesh,cog,[[1,0,0],[0,1,0],[0,0,1]],l)
 
@@ -239,3 +300,4 @@ def find_mins_maxs(file):
             maxz = max(p[stl.Dimension.Z], maxz)
             minz = min(p[stl.Dimension.Z], minz)
     return maxx-minx, maxy-miny,  maxz-minz
+
