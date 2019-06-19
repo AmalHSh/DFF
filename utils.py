@@ -135,9 +135,12 @@ def show(your_mesh,cog,inertia,l):
     fig.savefig(tmpfile, format='png')
     return base64.b64encode(tmpfile.getvalue())
 
+#this function takes as an input a matrix and tests if it is positive or negative
 def is_pos(x):
     return np.all(np.linalg.eigvals(x) > 0)
 
+#This function calculates the number of vertices that has negative x coordinate and the positive onesself.
+#the function makes sure that the number of positive vertices is always bigger.
 def to_original(mesh):
     m=mesh.points
     v0=m[:,0]
@@ -160,6 +163,8 @@ def to_original(mesh):
         print('done')
         mesh.rotate([0,1,0], math.radians(180))
 
+#this function tests if the moment of inertia is diagonal or notself.
+#if not it rotates the mesh to make the moment of inertia diagonal
 def align(mesh, ax, inertia):
     m=mesh.points
     bx=np.linalg.inv(ax)
@@ -175,7 +180,7 @@ def align(mesh, ax, inertia):
             mesh.points=m
     return mesh
 
-
+# this function takes a mesh calculates her principle axes hef rotation and transfer it to the cartesian coordinate system
 def correct(mesh):
     volume, cog, inertia = mesh.get_mass_properties()
     eigs, ax = np.linalg.eigh(inertia)
@@ -201,6 +206,7 @@ def correct(mesh):
     else:
         mesh.rotate([1,0,0],(angleZ))
         return correct(mesh)
+
 
 
 #This function has a job of taking an stl file shift it to his center of mass and shift to his main axes
